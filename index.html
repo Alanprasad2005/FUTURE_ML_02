@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Portfolio Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>AI-Powered Portfolio Management System</h1>
+
+    <div class="summary">
+        <div>Total Invested: ₹{{ total_invested }}</div>
+        <div>Current Value: ₹{{ current_value }}</div>
+        <div class="pnl {% if pnl >= 0 %}positive{% else %}negative{% endif %}">Profit & Loss: ₹{{ pnl }}</div>
+        <div>Growth: {{ "%.2f"|format(growth) }}%</div>
+    </div>
+
+    <h2>Add New Stock</h2>
+    <form action="/add_stock" method="POST">
+        <input type="text" name="symbol" placeholder="Company Symbol" required>
+        <input type="number" name="shares" placeholder="Shares" required>
+        <input type="number" step="0.01" name="avg_cost" placeholder="Avg Cost" required>
+        <button type="submit">Add Stock</button>
+    </form>
+
+    <h2>Portfolio Insights</h2>
+    <div class="insights">
+        {% for insight in insights %}
+            <p>{{ insight }}</p>
+        {% endfor %}
+    </div>
+
+    <h2>Your Holdings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Shares</th>
+                <th>Avg Cost</th>
+                <th>LTP</th>
+                <th>Current Value</th>
+                <th>P&L</th>
+                <th>Sentiment</th>
+                <th>Price Prediction (7 days)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in portfolio %}
+            <tr>
+                <td>{{ stock.symbol }}</td>
+                <td>{{ stock.shares }}</td>
+                <td>₹{{ "%.2f"|format(stock.avg_cost) }}</td>
+                <td>{{ stock.ltp }}</td>
+                <td>₹{{ "%.2f"|format(stock.current_value) }}</td>
+                <td class="{% if stock.pnl >= 0 %}positive{% else %}negative{% endif %}">₹{{ "%.2f"|format(stock.pnl) }}</td>
+                <td>{{ "%.2f"|format(stock.sentiment) }}</td>
+                <td>
+                    {% for price in stock.predictions %}
+                        ₹{{ "%.2f"|format(price) }}<br>
+                    {% endfor %}
+                </td>
+                <td><a href="{{ url_for('delete_stock', symbol=stock.symbol) }}" class="delete">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Price Prediction Chart</h2>
+    <canvas id="predictionChart"></canvas>
+    
+    <script>
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        const labels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
+        const data = {
+            labels: labels,
+            datasets: [
+                {% for stock in portfolio %}
+                {
+                    label: "{{ stock.symbol }}",
+                    data: {{ stock.predictions | tojson }},
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    tension: 0.4
+                },
+                {% endfor %}
+            ]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+            },
+        });
+    </script>
+</body>
+</html>

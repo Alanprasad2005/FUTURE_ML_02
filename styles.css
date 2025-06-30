@@ -1,0 +1,47 @@
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #42a5f5;
+}
+
+form {
+    margin: 20px 0;
+}
+
+input, button {
+    margin: 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #42a5f5;
+    color: #fff;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #42a5f5;
+    padding: 10px;
+    text-align: center;
+}
+
+.green {
+    color: #4caf50;
+}
+
+.red {
+    color: #f44336;
+}
